@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
 import { useForm } from 'react-hook-form'
+import {
+  clearCardDraft,
+  EMPTY_CARD_FORM,
+  loadCardDraft,
+  saveCardDraft,
+  type CardForm,
+} from './cardDraft'
 import styles from './CreateCardPage.module.css'
 
 const PRIORITIES = ['High', 'Medium', 'Low'] as const
@@ -12,16 +19,6 @@ const TAG_STYLES = [
   { bg: '#ffe7e7', color: '#ea3a3a' },
 ]
 
-type CardForm = {
-  title: string
-  description: string
-  priority: string
-  status: string
-  assignee: string
-  deadline: string
-  tags: string[]
-}
-
 function formatDeadline(value: string) {
   if (!value) return '—'
   const date = new Date(`${value}T00:00:00`)
@@ -30,9 +27,10 @@ function formatDeadline(value: string) {
 }
 
 export function CreateCardPage() {
-  const [mode, setMode] = useState<'form' | 'preview'>('form')
-  const [files, setFiles] = useState<File[]>([])
-  const [tagDraft, setTagDraft] = useState('')
+  const draft = loadCardDraft()
+  const [mode, setMode] = useState<'form' | 'preview'>(draft.mode)
+  const [files, setFiles] = useState<File[]>(draft.files)
+  const [tagDraft, setTagDraft] = useState(draft.tagDraft)
   const {
     register,
     handleSubmit,
@@ -41,19 +39,15 @@ export function CreateCardPage() {
     setValue,
     formState: { errors },
   } = useForm<CardForm>({
-    defaultValues: {
-      title: '',
-      description: '',
-      priority: '',
-      status: '',
-      assignee: '',
-      deadline: '',
-      tags: [],
-    },
+    defaultValues: draft.values,
   })
 
   const values = watch()
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files])
+
+  useEffect(() => {
+    saveCardDraft({ values, mode, tagDraft, files })
+  }, [values, mode, tagDraft, files])
 
   useEffect(() => {
     return () => previews.forEach((url) => URL.revokeObjectURL(url))
@@ -279,9 +273,11 @@ export function CreateCardPage() {
             className={styles.ghost}
             type="button"
             onClick={() => {
-              reset()
+              clearCardDraft()
+              reset(EMPTY_CARD_FORM)
               setFiles([])
               setTagDraft('')
+              setMode('form')
             }}
           >
             Cancel

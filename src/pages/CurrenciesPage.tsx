@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { fetchCurrencyTable, fetchUsdHistory, type CurrencyRow, type HistoryPoint } from '../api/currencies'
-import { FLAG_EMOJI, formatRate } from '../lib/currencyMeta'
+import { flagImg, formatRate } from '../lib/currencyMeta'
 import styles from './CurrenciesPage.module.css'
 
 const RANGES = [
@@ -97,8 +97,9 @@ export function CurrenciesPage() {
                     className={row.code === selected ? styles.rowActive : styles.row}
                     onClick={() => setSelected(row.code === selected ? null : row.code)}
                   >
-                    <td>
-                      {FLAG_EMOJI[row.code] ?? ''} {row.code}
+                    <td className={styles.currency}>
+                      <img className={styles.flag} src={flagImg(row.code)} alt="" />
+                      {row.code}
                     </td>
                     <td>{formatRate(row.surrender)}</td>
                     <td>{formatRate(row.buy)}</td>
@@ -117,7 +118,7 @@ export function CurrenciesPage() {
         <aside className={styles.chartPanel}>
           <div>
             <p className={styles.pair}>
-              {FLAG_EMOJI[selected]} {selected} / USD
+              <img className={styles.flag} src={flagImg(selected)} alt="" /> {selected} / USD
             </p>
             <p className={styles.pairSub}>Monthly dynamics</p>
           </div>

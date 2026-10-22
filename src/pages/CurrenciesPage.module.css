@@ -1,182 +1,187 @@
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 20px;
+  align-items: start;
+}
+
+.mainCol {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 12px;
 }
 
 .title {
   margin: 0;
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 700;
+  color: var(--ink);
 }
 
 .dateChip {
-  background: var(--chip);
-  color: var(--chip-ink);
-  border-radius: 999px;
-  padding: 8px 14px;
+  margin-left: auto;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 10px;
+  padding: 7px 14px;
   font-size: 13px;
   font-weight: 600;
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
-}
-
-.layoutSplit {
-  composes: layout;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
-}
-
 .card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.tableWrap {
-  overflow-x: auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 4px 20px;
+  overflow: auto;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  min-width: 640px;
 }
 
 .table th {
   text-align: left;
   font-size: 12px;
   font-weight: 500;
-  color: #9aa1b8;
-  padding: 18px 16px 12px;
+  color: var(--muted);
+  padding: 12px;
 }
 
 .table td {
-  padding: 14px 16px;
+  padding: 16px 12px;
   border-top: 1px solid var(--line);
   font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 .row {
   cursor: pointer;
 }
 
-.row:hover td {
-  background: #f8f9ff;
-}
-
 .rowActive td {
   background: var(--accent-soft);
-}
-
-.currency {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   font-weight: 600;
 }
 
-.flag {
-  width: 22px;
-  height: 16px;
-  object-fit: cover;
-  border-radius: 3px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+.rowActive td:first-child {
+  border-radius: 12px 0 0 12px;
 }
 
-.changeUp {
-  color: var(--success);
-  font-weight: 600;
-}
-
-.changeDown {
-  color: var(--danger);
-  font-weight: 600;
+.rowActive td:last-child {
+  border-radius: 0 12px 12px 0;
 }
 
 .status {
-  padding: 28px 20px;
-  color: var(--ink-soft);
+  padding: 20px 12px;
+  color: var(--muted);
 }
 
 .retry {
   margin-top: 12px;
   border: 0;
-  background: var(--primary);
+  background: var(--ink);
   color: #fff;
   border-radius: 10px;
   padding: 8px 14px;
 }
 
-.chartCard {
-  composes: card;
-  padding: 22px 20px 8px;
-  min-height: 320px;
-}
-
-.chartHead {
+.chartPanel {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 24px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 520px;
 }
 
 .pair {
   margin: 0;
-  color: var(--ink-soft);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.pairSub {
+  margin: 4px 0 0;
+  color: var(--muted);
   font-size: 13px;
+}
+
+.rateRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .rate {
-  margin: 6px 0 0;
-  font-size: 32px;
+  margin: 0;
+  font-size: 36px;
   font-weight: 700;
 }
 
-.delta {
-  font-size: 13px;
-  font-weight: 700;
-  padding: 4px 8px;
+.deltaUp,
+.deltaDown {
   border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .deltaUp {
-  composes: delta;
+  background: var(--success-soft);
   color: var(--success);
-  background: #ecfdf3;
 }
 
 .deltaDown {
-  composes: delta;
-  color: var(--danger);
   background: var(--danger-soft);
+  color: var(--danger);
 }
 
-.hint {
-  margin: 0;
-  color: var(--ink-soft);
+.chartBox {
+  background: #f2fcf5;
+  border-radius: 14px;
+  height: 200px;
+}
+
+.ranges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.range,
+.rangeActive {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 16px;
   font-size: 13px;
+  font-weight: 600;
+}
+
+.range {
+  background: #f0f1f6;
+  color: var(--muted);
+}
+
+.rangeActive {
+  background: var(--ink);
+  color: #fff;
 }
 
 @media (max-width: 1100px) {
-  .layoutSplit {
+  .split {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .title {
-    font-size: 24px;
-  }
-
-  .header {
-    align-items: flex-start;
-    flex-direction: column;
   }
 }

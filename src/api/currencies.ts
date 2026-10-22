@@ -100,9 +100,9 @@ export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
   })
 }
 
-export async function fetchUsdHistory(code: string): Promise<HistoryPoint[]> {
+export async function fetchUsdHistory(code: string, days = 30): Promise<HistoryPoint[]> {
   const end = isoDate(new Date())
-  const start = isoDate(daysAgo(30))
+  const start = isoDate(daysAgo(days))
   const seriesCode = code === 'BGN' ? 'EUR' : code
   const data = await fetchJson<FrankfurterSeries>(
     `https://api.frankfurter.dev/v1/${start}..${end}?base=USD&symbols=${seriesCode}`,

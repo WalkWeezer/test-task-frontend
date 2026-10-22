@@ -27,62 +27,58 @@ export function LoginPage() {
         onSubmit={handleSubmit((values) => {
           const result = login(values.email, values.password)
           if (!result.ok) {
-            setError('email', { message: result.message })
-            setError('password', { message: result.message })
+            setError('email', { message: 'Please enter a valid email address' })
+            setError('password', { message: 'Password must be at least 6 characters' })
             return
           }
           navigate('/', { replace: true })
         })}
         noValidate
       >
-        <h1 className={styles.title}>Log in</h1>
-        <p className={styles.subtitle}>Welcome Back</p>
+        <div className={styles.titleGroup}>
+          <h1 className={styles.title}>Log in</h1>
+          <p className={styles.subtitle}>Welcome Back</p>
+        </div>
         <label className={styles.field}>
-          <span className={styles.srOnly}>Email Address</span>
           <span className={styles.inputWrap}>
-            <span className={styles.icon} aria-hidden>
-              ✉
-            </span>
+            <span className={errors.email ? styles.iconError : styles.icon}>✉</span>
             <input
-            className={errors.email ? styles.inputError : styles.input}
-            type="email"
-            placeholder="Email Address"
-            autoComplete="username"
-            {...register('email', {
-              required: 'This field is required',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Enter a valid e-mail',
-              },
-            })}
-          />
+              className={errors.email ? styles.inputError : styles.input}
+              type="email"
+              placeholder="Email Address"
+              autoComplete="username"
+              {...register('email', {
+                required: 'Please enter a valid email address',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Please enter a valid email address',
+                },
+              })}
+            />
           </span>
-          <p className={styles.error}>{errors.email?.message ?? ''}</p>
+          {errors.email ? <p className={styles.error}>{errors.email.message}</p> : null}
         </label>
         <label className={styles.field}>
-          <span className={styles.srOnly}>Password</span>
           <span className={styles.inputWrap}>
-            <span className={styles.icon} aria-hidden>
-              🔒
-            </span>
+            <span className={errors.password ? styles.iconError : styles.icon}>🔒</span>
             <input
-            className={errors.password ? styles.inputError : styles.input}
-            type="password"
-            placeholder="Password"
-            autoComplete="current-password"
-            {...register('password', {
-              required: 'This field is required',
-              minLength: { value: 6, message: 'Minimum 6 characters' },
-            })}
-          />
+              className={errors.password ? styles.inputError : styles.input}
+              type="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              {...register('password', {
+                required: 'Password must be at least 6 characters',
+                minLength: { value: 6, message: 'Password must be at least 6 characters' },
+              })}
+            />
           </span>
-          <p className={styles.error}>{errors.password?.message ?? ''}</p>
+          {errors.password ? <p className={styles.error}>{errors.password.message}</p> : null}
         </label>
         <button className={styles.submit} type="submit">
           Login
         </button>
         <p className={styles.hint}>
-          Mock login: <code>{MOCK_EMAIL}</code> / <code>{MOCK_PASSWORD}</code>
+          {MOCK_EMAIL} / {MOCK_PASSWORD}
         </p>
       </form>
     </div>

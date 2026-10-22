@@ -1,71 +1,37 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import styles from './AppLayout.module.css'
-
-function RatesIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M4 19V5M4 19h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M8 15l3.5-4 3 2.5L19 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function CardsIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M8 10h8M8 14h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  )
-}
 
 export function AppLayout() {
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className={`${styles.shell} ${expanded ? styles.shellExpanded : ''}`}>
-      <aside className={`${styles.sidebar} ${expanded ? styles.sidebarExpanded : ''}`}>
-        <button className={styles.brand} type="button" onClick={() => setExpanded((value) => !value)}>
-          <span className={styles.brandIcon} aria-hidden>
-            💰
-          </span>
-          {expanded ? <span>Dashboard</span> : null}
-        </button>
-        {expanded ? <p className={styles.menuLabel}>MENU</p> : null}
+    <div className={styles.shell}>
+      <aside className={styles.sidebar}>
+        <div className={styles.brand} aria-hidden>
+          💰
+        </div>
         <nav className={styles.nav}>
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
-            title="Exchange Rates"
-          >
-            <RatesIcon />
-            {expanded ? <span>Exchange Rates</span> : null}
+          <NavLink to="/" end className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            <span className={styles.emoji}>💱</span>
+            <span>Rates</span>
           </NavLink>
-          <NavLink
-            to="/cards"
-            className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
-            title="Kanban Cards"
-          >
-            <CardsIcon />
-            {expanded ? <span>Kanban Cards</span> : null}
+          <NavLink to="/cards" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            <span className={styles.emoji}>📋</span>
+            <span>Cards</span>
           </NavLink>
         </nav>
         <button
           className={styles.logout}
           type="button"
-          title="Logout"
           onClick={() => {
             logout()
             navigate('/login')
           }}
         >
-          <span className={styles.logoutMark} aria-hidden />
-          {expanded ? <span>Logout</span> : null}
+          <span className={styles.emojiSmall}>🚪</span>
+          <span>Logout</span>
         </button>
       </aside>
       <main className={styles.content}>

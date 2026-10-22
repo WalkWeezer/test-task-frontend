@@ -1,31 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { fetchCurrencyTable, fetchUsdHistory, type CurrencyRow, type HistoryPoint } from '../api/currencies'
-import { flagUrl, formatChange, formatRate } from '../lib/currencyMeta'
+import { FLAG_EMOJI, formatRate } from '../lib/currencyMeta'
 import styles from './CurrenciesPage.module.css'
 
-function changeClass(value: number) {
-  if (value > 0) return styles.changeUp
-  if (value < 0) return styles.changeDown
-  return undefined
-}
+const RANGES = [
+  { id: '1W', days: 7 },
+  { id: '1M', days: 30 },
+  { id: '3M', days: 90 },
+  { id: '6M', days: 180 },
+  { id: '1Y', days: 365 },
+] as const
 
 export function CurrenciesPage() {
   const [rows, setRows] = useState<CurrencyRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
+  const [range, setRange] = useState<(typeof RANGES)[number]['id']>('1M')
   const [history, setHistory] = useState<HistoryPoint[]>([])
   const [chartLoading, setChartLoading] = useState(false)
-  const [chartError, setChartError] = useState<string | null>(null)
 
   const loadTable = () => {
     setLoading(true)
@@ -40,15 +34,16 @@ export function CurrenciesPage() {
     loadTable()
   }, [])
 
+  const days = RANGES.find((item) => item.id === range)?.days ?? 30
+
   useEffect(() => {
     if (!selected) return
     setChartLoading(true)
-    setChartError(null)
-    fetchUsdHistory(selected)
+    fetchUsdHistory(selected, days)
       .then(setHistory)
-      .catch((err: unknown) => setChartError(err instanceof Error ? err.message : 'Failed to load chart'))
+      .catch(() => setHistory([]))
       .finally(() => setChartLoading(false))
-  }, [selected])
+  }, [selected, days])
 
   const selectedRow = rows.find((row) => row.code === selected)
   const first = history[0]?.value
@@ -63,15 +58,16 @@ export function CurrenciesPage() {
       }),
     [],
   )
+  const compact = Boolean(selected)
 
   return (
-    <section>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Exchange rates</h1>
-        <span className={styles.dateChip}>{today}</span>
-      </header>
+    <section className={compact ? styles.split : undefined}>
+      <div className={styles.mainCol}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Exchange rates</h1>
+          <span className={styles.dateChip}>{today}</span>
+        </header>
 
-      <div className={selected ? styles.layoutSplit : styles.layout}>
         <div className={styles.card}>
           {loading ? <p className={styles.status}>Loading exchange rates…</p> : null}
           {error ? (
@@ -83,74 +79,88 @@ export function CurrenciesPage() {
             </div>
           ) : null}
           {!loading && !error ? (
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Currency</th>
-                    <th>Surrender</th>
-                    <th>Buy</th>
-                    <th>Course</th>
-                    <th>Change</th>
-                    <th>Time</th>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Currency</th>
+                  <th>Surrender</th>
+                  <th>Buy</th>
+                  <th>Course</th>
+                  {compact ? null : <th>Change</th>}
+                  {compact ? null : <th>Time</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr
+                    key={row.code}
+                    className={row.code === selected ? styles.rowActive : styles.row}
+                    onClick={() => setSelected(row.code === selected ? null : row.code)}
+                  >
+                    <td>
+                      {FLAG_EMOJI[row.code] ?? ''} {row.code}
+                    </td>
+                    <td>{formatRate(row.surrender)}</td>
+                    <td>{formatRate(row.buy)}</td>
+                    <td>{formatRate(row.course)}</td>
+                    {compact ? null : <td>{formatRate(Math.abs(row.change))}</td>}
+                    {compact ? null : <td>{row.time}</td>}
                   </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr
-                      key={row.code}
-                      className={row.code === selected ? styles.rowActive : styles.row}
-                      onClick={() => setSelected(row.code)}
-                    >
-                      <td>
-                        <span className={styles.currency}>
-                          <img className={styles.flag} src={flagUrl(row.code)} alt="" referrerPolicy="no-referrer" />
-                          {row.code}
-                        </span>
-                      </td>
-                      <td>{formatRate(row.surrender)}</td>
-                      <td>{formatRate(row.buy)}</td>
-                      <td>{formatRate(row.course)}</td>
-                      <td className={changeClass(row.change)}>{formatChange(row.change)}</td>
-                      <td>{row.time}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           ) : null}
         </div>
+      </div>
 
-        {selected ? (
-          <aside className={styles.chartCard}>
-            <div className={styles.chartHead}>
-              <div>
-                <p className={styles.pair}>{selected} / USD, 30d</p>
-                <p className={styles.rate}>{selectedRow ? formatRate(selectedRow.course) : '—'}</p>
-              </div>
-              <span className={deltaPct >= 0 ? styles.deltaUp : styles.deltaDown}>
-                {deltaPct >= 0 ? '+' : ''}
-                {deltaPct.toFixed(2)}%
-              </span>
-            </div>
-            {chartLoading ? <p className={styles.hint}>Loading chart…</p> : null}
-            {chartError ? <p className={styles.hint}>{chartError}</p> : null}
-            {!chartLoading && !chartError && history.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <LineChart data={history} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid stroke="#eef1f8" vertical={false} />
+      {selected && selectedRow ? (
+        <aside className={styles.chartPanel}>
+          <div>
+            <p className={styles.pair}>
+              {FLAG_EMOJI[selected]} {selected} / USD
+            </p>
+            <p className={styles.pairSub}>Monthly dynamics</p>
+          </div>
+          <div className={styles.rateRow}>
+            <p className={styles.rate}>{formatRate(selectedRow.course)}</p>
+            <span className={deltaPct >= 0 ? styles.deltaUp : styles.deltaDown}>
+              {deltaPct >= 0 ? '▲' : '▼'} {deltaPct >= 0 ? '+' : ''}
+              {deltaPct.toFixed(2)}%
+            </span>
+          </div>
+          <div className={styles.chartBox}>
+            {chartLoading ? <p className={styles.status}>Loading chart…</p> : null}
+            {!chartLoading && history.length > 0 ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={history} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="rateFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#7bd39a" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="#7bd39a" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
                   <XAxis dataKey="date" hide />
                   <YAxis domain={['auto', 'auto']} hide />
-                  <Tooltip
-                    formatter={(value) => [typeof value === 'number' ? formatRate(value) : String(value), selected]}
-                  />
-                  <Line type="monotone" dataKey="value" stroke="#7bd39a" strokeWidth={3} dot={false} />
-                </LineChart>
+                  <Tooltip formatter={(value) => [typeof value === 'number' ? formatRate(value) : String(value), selected]} />
+                  <Area type="monotone" dataKey="value" stroke="#3cc56a" strokeWidth={2} fill="url(#rateFill)" />
+                </AreaChart>
               </ResponsiveContainer>
             ) : null}
-          </aside>
-        ) : null}
-      </div>
+          </div>
+          <div className={styles.ranges}>
+            {RANGES.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={range === item.id ? styles.rangeActive : styles.range}
+                onClick={() => setRange(item.id)}
+              >
+                {item.id}
+              </button>
+            ))}
+          </div>
+        </aside>
+      ) : null}
     </section>
   )
 }

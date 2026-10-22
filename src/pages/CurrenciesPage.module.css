@@ -1,0 +1,182 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.dateChip {
+  background: var(--chip);
+  color: var(--chip-ink);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.layoutSplit {
+  composes: layout;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9aa1b8;
+  padding: 18px 16px 12px;
+}
+
+.table td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: #f8f9ff;
+}
+
+.rowActive td {
+  background: var(--accent-soft);
+}
+
+.currency {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.flag {
+  width: 22px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.changeUp {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.changeDown {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.status {
+  padding: 28px 20px;
+  color: var(--ink-soft);
+}
+
+.retry {
+  margin-top: 12px;
+  border: 0;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.chartCard {
+  composes: card;
+  padding: 22px 20px 8px;
+  min-height: 320px;
+}
+
+.chartHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pair {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.rate {
+  margin: 6px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.delta {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.deltaUp {
+  composes: delta;
+  color: var(--success);
+  background: #ecfdf3;
+}
+
+.deltaDown {
+  composes: delta;
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+  .layoutSplit {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 24px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import styles from './CreateCardPage.module.css'
 
@@ -19,14 +19,7 @@ type CardForm = {
   status: string
   assignee: string
   deadline: string
-  tags: string
-}
-
-function parseTags(value: string) {
-  return value
-    .split(',')
-    .map((tag) => tag.trim())
-    .filter(Boolean)
+  tags: string[]
 }
 
 function formatDeadline(value: string) {
@@ -39,11 +32,13 @@ function formatDeadline(value: string) {
 export function CreateCardPage() {
   const [mode, setMode] = useState<'form' | 'preview'>('form')
   const [files, setFiles] = useState<File[]>([])
+  const [tagDraft, setTagDraft] = useState('')
   const {
     register,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<CardForm>({
     defaultValues: {
@@ -53,7 +48,7 @@ export function CreateCardPage() {
       status: '',
       assignee: '',
       deadline: '',
-      tags: '',
+      tags: [],
     },
   })
 
@@ -69,8 +64,32 @@ export function CreateCardPage() {
     setFiles((current) => [...current, ...Array.from(list)].slice(0, 6))
   }
 
+  const addTag = (raw: string) => {
+    const parts = raw
+      .split(/[,\s]+/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+    if (!parts.length) return
+    const next = [...values.tags]
+    for (const tag of parts) {
+      if (!next.some((item) => item.toLowerCase() === tag.toLowerCase())) next.push(tag)
+    }
+    setValue('tags', next)
+    setTagDraft('')
+  }
+
+  const onTagKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault()
+      addTag(tagDraft)
+    }
+    if (event.key === 'Backspace' && !tagDraft && values.tags.length) {
+      setValue('tags', values.tags.slice(0, -1))
+    }
+  }
+
   if (mode === 'preview') {
-    const tags = parseTags(values.tags)
+    const tags = values.tags
     return (
       <section className={styles.page}>
         <header className={styles.header}>
@@ -211,10 +230,33 @@ export function CreateCardPage() {
               <span className={styles.label}>Deadline</span>
               <input className={styles.control} type="date" {...register('deadline')} />
             </label>
-            <label className={styles.field}>
+            <div className={styles.field}>
               <span className={styles.label}>Tags</span>
-              <input className={styles.control} placeholder="Add tags..." {...register('tags')} />
-            </label>
+              <div className={styles.tagInput}>
+                {values.tags.map((tag, index) => {
+                  const style = TAG_STYLES[index % TAG_STYLES.length]
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      className={styles.tagChip}
+                      style={{ background: style.bg, color: style.color }}
+                      onClick={() => setValue('tags', values.tags.filter((item) => item !== tag))}
+                    >
+                      {tag}
+                    </button>
+                  )
+                })}
+                <input
+                  className={styles.tagField}
+                  placeholder={values.tags.length ? '' : 'Add tags...'}
+                  value={tagDraft}
+                  onChange={(event) => setTagDraft(event.target.value)}
+                  onKeyDown={onTagKeyDown}
+                  onBlur={() => addTag(tagDraft)}
+                />
+              </div>
+            </div>
             <div className={styles.field}>
               <span className={styles.label}>Images</span>
               <label className={styles.drop}>
@@ -239,6 +281,7 @@ export function CreateCardPage() {
             onClick={() => {
               reset()
               setFiles([])
+              setTagDraft('')
             }}
           >
             Cancel

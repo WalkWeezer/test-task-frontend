@@ -97,6 +97,36 @@ select.controlError {
   font-weight: 500;
 }
 
+.tagInput {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 45px;
+  background: var(--input);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.tagChip {
+  border: 0;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tagField {
+  flex: 1;
+  min-width: 80px;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--ink);
+  font-size: 14px;
+  padding: 4px 0;
+}
+
 .drop {
   height: 120px;
   border: 2px dashed var(--border);

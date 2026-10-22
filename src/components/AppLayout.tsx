@@ -24,42 +24,48 @@ function CardsIcon() {
 export function AppLayout() {
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className={styles.shell}>
-      <button className={styles.menuToggle} type="button" onClick={() => setOpen(true)} aria-label="Open menu">
-        ☰
-      </button>
-      {open ? <button className={styles.backdrop} type="button" aria-label="Close menu" onClick={() => setOpen(false)} /> : null}
-      <aside className={`${styles.sidebar} ${open ? styles.sidebarOpen : ''}`}>
-        <div className={styles.brand}>
+    <div className={`${styles.shell} ${expanded ? styles.shellExpanded : ''}`}>
+      <aside className={`${styles.sidebar} ${expanded ? styles.sidebarExpanded : ''}`}>
+        <button className={styles.brand} type="button" onClick={() => setExpanded((value) => !value)}>
           <span className={styles.brandIcon} aria-hidden>
             💰
           </span>
-          Dashboard
-        </div>
-        <p className={styles.menuLabel}>MENU</p>
-        <nav className={styles.nav} onClick={() => setOpen(false)}>
-          <NavLink to="/" end className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+          {expanded ? <span>Dashboard</span> : null}
+        </button>
+        {expanded ? <p className={styles.menuLabel}>MENU</p> : null}
+        <nav className={styles.nav}>
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
+            title="Exchange Rates"
+          >
             <RatesIcon />
-            Exchange Rates
+            {expanded ? <span>Exchange Rates</span> : null}
           </NavLink>
-          <NavLink to="/cards" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+          <NavLink
+            to="/cards"
+            className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
+            title="Kanban Cards"
+          >
             <CardsIcon />
-            Kanban Cards
+            {expanded ? <span>Kanban Cards</span> : null}
           </NavLink>
         </nav>
         <button
           className={styles.logout}
           type="button"
+          title="Logout"
           onClick={() => {
             logout()
             navigate('/login')
           }}
         >
-          <span aria-hidden>◼</span>
-          Logout
+          <span className={styles.logoutMark} aria-hidden />
+          {expanded ? <span>Logout</span> : null}
         </button>
       </aside>
       <main className={styles.content}>

@@ -28,7 +28,8 @@ npm run preview
 
 ## API
 
-- Курсы и история: [Frankfurter](https://frankfurter.dev/) (`https://api.frankfurter.dev/v1`) — бесплатный API без ключа, база USD.
+- Актуальные курсы: [Open Exchange Rate API](https://www.exchangerate-api.com/docs/free) (`https://open.er-api.com/v6/latest/USD`) — без ключа, есть BGN и остальные валюты из макета.
+- История графика: [Frankfurter](https://frankfurter.dev/) (`https://api.frankfurter.dev/v1`).
 - Флаги: [Flagcdn](https://flagcdn.com/).
 
 Колонки **Surrender / Buy** в макете — bid/ask. Frankfurter отдаёт только mid-курс, поэтому:

@@ -43,15 +43,23 @@
   width: 100%;
   border: 1px solid transparent;
   background: var(--input);
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: 14px;
+  padding: 14px 16px;
   outline: none;
   color: var(--ink);
+  appearance: none;
 }
 
 .textarea {
-  min-height: 168px;
+  min-height: 220px;
   resize: vertical;
+}
+
+.select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%236b728c' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
 }
 
 .input:focus,

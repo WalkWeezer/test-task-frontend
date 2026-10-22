@@ -14,23 +14,17 @@ export type HistoryPoint = {
   value: number
 }
 
-type LatestResponse = {
-  amount: number
-  base: string
-  date: string
+type OpenErResponse = {
+  result: string
+  time_last_update_utc: string
   rates: Record<string, number>
 }
 
-type TimeseriesResponse = {
-  amount: number
-  base: string
-  start_date: string
-  end_date: string
+type FrankfurterSeries = {
   rates: Record<string, Record<string, number>>
 }
 
-const BASE = 'https://api.frankfurter.dev/v1'
-export const TABLE_CURRENCIES = ['AUD', 'BGN', 'EUR', 'GBP', 'JPY'] as const
+export const TABLE_CURRENCIES = ['AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY'] as const
 
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url)
@@ -50,35 +44,58 @@ function daysAgo(days: number): Date {
   return date
 }
 
-export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
-  const latest = await fetchJson<LatestResponse>(`${BASE}/latest?base=USD`)
-  if (latest.rates.BGN == null && latest.rates.EUR != null) {
-    const euro = await fetchJson<LatestResponse>(`${BASE}/latest?base=EUR&symbols=BGN`)
-    if (euro.rates.BGN != null) latest.rates.BGN = euro.rates.BGN * latest.rates.EUR
+function formatClock(utcStamp: string): string {
+  const parsed = new Date(utcStamp)
+  if (Number.isNaN(parsed.getTime())) {
+    return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
   }
-  const available = TABLE_CURRENCIES.filter((code) => latest.rates[code] != null)
-  const symbols = available.join(',')
-  const history = await fetchJson<TimeseriesResponse>(
-    `${BASE}/${isoDate(daysAgo(7))}..${latest.date}?base=USD&symbols=${symbols}`,
-  )
+  return parsed.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+}
 
-  const previousDates = Object.keys(history.rates).sort()
-  const previousKey = previousDates.at(-2) ?? previousDates.at(-1)
-  const previousRates = previousKey ? history.rates[previousKey] : undefined
-  const fetchedAt = new Date().toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+function lastTwo(rates: Record<string, Record<string, number>>, code: string) {
+  const dates = Object.keys(rates).sort()
+  const prev = dates.at(-2)
+  const last = dates.at(-1)
+  if (!prev || !last) return 0
+  const a = rates[prev]?.[code]
+  const b = rates[last]?.[code]
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return 0
+  return b - a
+}
 
-  return available.map((code) => {
+export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
+  const latest = await fetchJson<OpenErResponse>('https://open.er-api.com/v6/latest/USD')
+  if (latest.result !== 'success') {
+    throw new Error('Exchange rate API returned an error')
+  }
+
+  let series: FrankfurterSeries['rates'] = {}
+  try {
+    const start = isoDate(daysAgo(7))
+    const end = isoDate(new Date())
+    const data = await fetchJson<FrankfurterSeries>(
+      `https://api.frankfurter.dev/v1/${start}..${end}?base=USD&symbols=AUD,BRL,CAD,CHF,EUR,GBP,JPY`,
+    )
+    series = data.rates
+  } catch {
+    series = {}
+  }
+
+  const time = formatClock(latest.time_last_update_utc)
+  const eurChange = lastTwo(series, 'EUR')
+
+  return TABLE_CURRENCIES.map((code) => {
     const course = latest.rates[code]
-    const prev = previousRates?.[code]
-    const change = prev === undefined ? 0 : course - prev
+    if (!Number.isFinite(course)) {
+      throw new Error(`Missing rate for ${code}`)
+    }
+    const change =
+      code === 'BGN' ? eurChange * (course / (latest.rates.EUR || 1)) : lastTwo(series, code)
     return {
       code,
       ...withSpread(course),
       change,
-      time: fetchedAt,
+      time,
     }
   })
 }
@@ -86,15 +103,22 @@ export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
 export async function fetchUsdHistory(code: string): Promise<HistoryPoint[]> {
   const end = isoDate(new Date())
   const start = isoDate(daysAgo(30))
-  const data = await fetchJson<TimeseriesResponse>(
-    `${BASE}/${start}..${end}?base=USD&symbols=${code}`,
+  const seriesCode = code === 'BGN' ? 'EUR' : code
+  const data = await fetchJson<FrankfurterSeries>(
+    `https://api.frankfurter.dev/v1/${start}..${end}?base=USD&symbols=${seriesCode}`,
   )
 
-  return Object.entries(data.rates)
+  const points = Object.entries(data.rates)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, rates]) => ({
       date,
-      value: rates[code],
+      value: rates[seriesCode],
     }))
     .filter((point) => Number.isFinite(point.value))
+
+  if (code !== 'BGN') return points
+
+  const latest = await fetchJson<OpenErResponse>('https://open.er-api.com/v6/latest/USD')
+  const peg = latest.rates.EUR ? latest.rates.BGN / latest.rates.EUR : 1.95583
+  return points.map((point) => ({ ...point, value: point.value * peg }))
 }

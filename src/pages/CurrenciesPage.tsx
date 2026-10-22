@@ -84,7 +84,6 @@ export function CurrenciesPage() {
           ) : null}
           {!loading && !error ? (
             <div className={styles.tableWrap}>
-              {!selected ? <p className={styles.selectHint}>Select a rate</p> : null}
               <table className={styles.table}>
                 <thead>
                   <tr>

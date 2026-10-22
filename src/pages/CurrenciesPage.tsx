@@ -104,7 +104,7 @@ export function CurrenciesPage() {
                     >
                       <td>
                         <span className={styles.currency}>
-                          <img className={styles.flag} src={flagUrl(row.code)} alt="" />
+                          <img className={styles.flag} src={flagUrl(row.code)} alt="" referrerPolicy="no-referrer" />
                           {row.code}
                         </span>
                       </td>

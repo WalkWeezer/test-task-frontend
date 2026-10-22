@@ -32,9 +32,9 @@ const FLAG_BY_CURRENCY: Record<string, string> = {
   ZAR: 'za',
 }
 
-export function flagUrl(code: string, size = 24): string {
+export function flagUrl(code: string): string {
   const country = FLAG_BY_CURRENCY[code] ?? code.slice(0, 2).toLowerCase()
-  return `https://flagcdn.com/w${size}/${country}.png`
+  return `https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/flags/4x3/${country}.svg`
 }
 
 export function formatRate(value: number): string {

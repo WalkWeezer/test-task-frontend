@@ -16,6 +16,12 @@
   align-items: center;
 }
 
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .formCard,
 .previewCard {
   background: #fff;

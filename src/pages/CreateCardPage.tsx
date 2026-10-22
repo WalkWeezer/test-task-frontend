@@ -132,6 +132,7 @@ export function CreateCardPage() {
     <section className={styles.page}>
       <h1 className={styles.title}>Create New Card</h1>
       <form
+        className={styles.form}
         onSubmit={handleSubmit((data) => {
           window.alert(
             JSON.stringify(

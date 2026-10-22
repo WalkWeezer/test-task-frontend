@@ -29,7 +29,8 @@ type TimeseriesResponse = {
   rates: Record<string, Record<string, number>>
 }
 
-const BASE = 'https://api.frankfurter.app'
+const BASE = 'https://api.frankfurter.dev/v1'
+export const TABLE_CURRENCIES = ['AUD', 'BGN', 'EUR', 'GBP', 'JPY'] as const
 
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url)
@@ -50,9 +51,15 @@ function daysAgo(days: number): Date {
 }
 
 export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
-  const latest = await fetchJson<LatestResponse>(`${BASE}/latest?from=USD`)
+  const latest = await fetchJson<LatestResponse>(`${BASE}/latest?base=USD`)
+  if (latest.rates.BGN == null && latest.rates.EUR != null) {
+    const euro = await fetchJson<LatestResponse>(`${BASE}/latest?base=EUR&symbols=BGN`)
+    if (euro.rates.BGN != null) latest.rates.BGN = euro.rates.BGN * latest.rates.EUR
+  }
+  const available = TABLE_CURRENCIES.filter((code) => latest.rates[code] != null)
+  const symbols = available.join(',')
   const history = await fetchJson<TimeseriesResponse>(
-    `${BASE}/${isoDate(daysAgo(7))}..${latest.date}?from=USD`,
+    `${BASE}/${isoDate(daysAgo(7))}..${latest.date}?base=USD&symbols=${symbols}`,
   )
 
   const previousDates = Object.keys(history.rates).sort()
@@ -63,25 +70,24 @@ export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
     minute: '2-digit',
   })
 
-  return Object.entries(latest.rates)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([code, course]) => {
-      const prev = previousRates?.[code]
-      const change = prev === undefined ? 0 : course - prev
-      return {
-        code,
-        ...withSpread(course),
-        change,
-        time: fetchedAt,
-      }
-    })
+  return available.map((code) => {
+    const course = latest.rates[code]
+    const prev = previousRates?.[code]
+    const change = prev === undefined ? 0 : course - prev
+    return {
+      code,
+      ...withSpread(course),
+      change,
+      time: fetchedAt,
+    }
+  })
 }
 
 export async function fetchUsdHistory(code: string): Promise<HistoryPoint[]> {
   const end = isoDate(new Date())
   const start = isoDate(daysAgo(30))
   const data = await fetchJson<TimeseriesResponse>(
-    `${BASE}/${start}..${end}?from=USD&to=${code}`,
+    `${BASE}/${start}..${end}?base=USD&symbols=${code}`,
   )
 
   return Object.entries(data.rates)

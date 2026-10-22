@@ -37,6 +37,17 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  position: relative;
+}
+
+.selectHint {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  margin: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .tableWrap {

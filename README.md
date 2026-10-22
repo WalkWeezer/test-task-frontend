@@ -2,7 +2,8 @@
 
 SPA по тестовому заданию: mock-авторизация, таблица курсов валют с графиком к USD и форма создания карточки.
 
-Макет: [Figma Test Task](https://www.figma.com/design/p3bs7nOd0noohqkGTjOvTm/Test-Task)
+- Деплой: https://test-task-frontend-liart.vercel.app
+- Макет: [Figma Test Task](https://www.figma.com/design/p3bs7nOd0noohqkGTjOvTm/Test-Task)
 
 ## Запуск
 
@@ -27,7 +28,7 @@ npm run preview
 
 ## API
 
-- Курсы и история: [Frankfurter](https://www.frankfurter.app/) (`https://api.frankfurter.app`) — бесплатный API без ключа, база USD.
+- Курсы и история: [Frankfurter](https://frankfurter.dev/) (`https://api.frankfurter.dev/v1`) — бесплатный API без ключа, база USD.
 - Флаги: [Flagcdn](https://flagcdn.com/).
 
 Колонки **Surrender / Buy** в макете — bid/ask. Frankfurter отдаёт только mid-курс, поэтому:

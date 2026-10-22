@@ -58,6 +58,10 @@ export function CreateCardPage() {
     setFiles((current) => [...current, ...Array.from(list)].slice(0, 6))
   }
 
+  const removeFile = (index: number) => {
+    setFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))
+  }
+
   const addTag = (raw: string) => {
     const parts = raw
       .split(/[,\s]+/)
@@ -252,19 +256,65 @@ export function CreateCardPage() {
               </div>
             </div>
             <div className={styles.field}>
-              <span className={styles.label}>Images</span>
-              <label className={styles.drop}>
-                <input
-                  className={styles.file}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(event) => addFiles(event.target.files)}
-                />
-                <span className={styles.cloud}>☁️</span>
-                <span className={styles.dropText}>Drag & drop images here</span>
-                <span className={styles.dropLink}>or click to browse</span>
-              </label>
+              <span className={styles.label}>Images{files.length ? ` (${files.length})` : ''}</span>
+              {files.length === 0 ? (
+                <label
+                  className={styles.drop}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault()
+                    addFiles(event.dataTransfer.files)
+                  }}
+                >
+                  <input
+                    className={styles.file}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(event) => {
+                      addFiles(event.target.files)
+                      event.target.value = ''
+                    }}
+                  />
+                  <span className={styles.cloud}>☁️</span>
+                  <span className={styles.dropText}>Drag & drop images here</span>
+                  <span className={styles.dropLink}>or click to browse</span>
+                </label>
+              ) : (
+                <div className={styles.imageGrid}>
+                  {files.map((file, index) => (
+                    <div key={`${file.name}-${file.size}-${file.lastModified}`} className={styles.imageItem}>
+                      <div className={styles.imageThumbWrap}>
+                        <img className={styles.imageThumb} src={previews[index]} alt={file.name} />
+                        <button
+                          className={styles.imageRemove}
+                          type="button"
+                          aria-label={`Remove ${file.name}`}
+                          onClick={() => removeFile(index)}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                      <span className={styles.imageName}>{file.name}</span>
+                    </div>
+                  ))}
+                  {files.length < 6 ? (
+                    <label className={styles.imageAdd}>
+                      <input
+                        className={styles.file}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(event) => {
+                          addFiles(event.target.files)
+                          event.target.value = ''
+                        }}
+                      />
+                      +
+                    </label>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
         </div>

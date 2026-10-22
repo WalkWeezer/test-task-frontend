@@ -127,6 +127,66 @@ select.controlError {
   padding: 4px 0;
 }
 
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.imageItem {
+  min-width: 0;
+}
+
+.imageThumbWrap {
+  position: relative;
+  height: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #d7dde8;
+}
+
+.imageThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imageRemove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+}
+
+.imageName {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imageAdd {
+  height: 64px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 22px;
+  cursor: pointer;
+}
+
 .drop {
   height: 120px;
   border: 2px dashed var(--border);

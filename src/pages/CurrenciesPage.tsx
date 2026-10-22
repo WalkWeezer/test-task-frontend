@@ -97,9 +97,11 @@ export function CurrenciesPage() {
                     className={row.code === selected ? styles.rowActive : styles.row}
                     onClick={() => setSelected(row.code === selected ? null : row.code)}
                   >
-                    <td className={styles.currency}>
-                      <img className={styles.flag} src={flagImg(row.code)} alt="" />
-                      {row.code}
+                    <td>
+                      <span className={styles.currency}>
+                        <img className={styles.flag} src={flagImg(row.code)} alt="" />
+                        {row.code}
+                      </span>
                     </td>
                     <td>{formatRate(row.surrender)}</td>
                     <td>{formatRate(row.buy)}</td>

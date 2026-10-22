@@ -2,6 +2,11 @@
   min-height: 100svh;
   display: grid;
   grid-template-columns: 72px 1fr;
+  transition: grid-template-columns 0.22s ease;
+}
+
+.shellExpanded {
+  grid-template-columns: 240px 1fr;
 }
 
 .sidebar {
@@ -9,16 +14,75 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 10px;
+  padding: 20px 10px 20px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.sidebarExpanded {
+  align-items: stretch;
+  padding: 24px 20px;
+  gap: 4px;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
   height: 44px;
-  display: grid;
-  place-items: center;
-  font-size: 24px;
   margin-bottom: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.sidebarExpanded .brand {
+  justify-content: flex-start;
+  height: auto;
+  margin-bottom: 16px;
+  padding-bottom: 0;
+}
+
+.brandEmoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.brandTitle {
+  display: none;
+  font-size: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sidebarExpanded .brandTitle {
+  display: block;
+}
+
+.divider,
+.menuLabel {
+  display: none;
+}
+
+.sidebarExpanded .divider {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+.sidebarExpanded .menuLabel {
+  display: block;
+  margin: 12px 0 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
 }
 
 .nav {
@@ -27,6 +91,10 @@
   gap: 8px;
   width: 100%;
   flex: 1;
+}
+
+.sidebarExpanded .nav {
+  gap: 0;
 }
 
 .link,
@@ -46,6 +114,19 @@
   font-size: 10px;
   font-weight: 500;
   line-height: 1;
+  white-space: nowrap;
+}
+
+.sidebarExpanded .link,
+.sidebarExpanded .linkActive,
+.sidebarExpanded .logout {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .linkActive {
@@ -54,9 +135,17 @@
   font-weight: 600;
 }
 
+.sidebarExpanded .linkActive {
+  font-weight: 600;
+}
+
 .emoji {
   font-size: 22px;
   line-height: 1;
+}
+
+.sidebarExpanded .emoji {
+  font-size: 20px;
 }
 
 .emojiSmall {
@@ -64,8 +153,30 @@
   line-height: 1;
 }
 
+.sidebarExpanded .emojiSmall {
+  font-size: 20px;
+}
+
+.fullLabel {
+  display: none;
+}
+
+.sidebarExpanded .shortLabel {
+  display: none;
+}
+
+.sidebarExpanded .fullLabel {
+  display: inline;
+}
+
 .logout {
   margin-top: auto;
+}
+
+.sidebarExpanded .logout {
+  margin-top: 8px;
+  color: var(--danger);
+  font-weight: 500;
 }
 
 .content {

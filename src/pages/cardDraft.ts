@@ -8,11 +8,17 @@ export type CardForm = {
   tags: string[]
 }
 
+export type CardImage = {
+  name: string
+  preview: string
+  file: File
+}
+
 export type CardDraft = {
   values: CardForm
   mode: 'form' | 'preview'
   tagDraft: string
-  files: File[]
+  images: CardImage[]
 }
 
 const STORAGE_KEY = 'test-task-card-draft'
@@ -31,7 +37,7 @@ let draft: CardDraft = {
   values: { ...EMPTY_CARD_FORM, tags: [] },
   mode: 'form',
   tagDraft: '',
-  files: [],
+  images: [],
 }
 
 let hydrated = false
@@ -84,7 +90,7 @@ export function loadCardDraft(): CardDraft {
   return {
     ...draft,
     values: { ...draft.values, tags: [...draft.values.tags] },
-    files: draft.files,
+    images: draft.images,
   }
 }
 
@@ -94,7 +100,7 @@ export function saveCardDraft(patch: Partial<CardDraft>) {
     values: patch.values ? { ...patch.values, tags: [...patch.values.tags] } : draft.values,
     mode: patch.mode ?? draft.mode,
     tagDraft: patch.tagDraft ?? draft.tagDraft,
-    files: patch.files ?? draft.files,
+    images: patch.images ?? draft.images,
   }
   persist()
 }
@@ -104,7 +110,7 @@ export function clearCardDraft() {
     values: { ...EMPTY_CARD_FORM, tags: [] },
     mode: 'form',
     tagDraft: '',
-    files: [],
+    images: [],
   }
   try {
     sessionStorage.removeItem(STORAGE_KEY)

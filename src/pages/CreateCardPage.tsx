@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
+import { useEffect, useState, type KeyboardEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   clearCardDraft,
@@ -6,8 +6,25 @@ import {
   loadCardDraft,
   saveCardDraft,
   type CardForm,
+  type CardImage,
 } from './cardDraft'
 import styles from './CreateCardPage.module.css'
+
+const IMAGE_FALLBACKS = ['#cfd8e7', '#d8cfe7', '#cfe7d8']
+
+function TrashIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+      <path
+        d="M4.2 1.5h3.6M2 3h8M9.2 3l-.3 6.2a1 1 0 0 1-1 .8H4.1a1 1 0 0 1-1-.8L2.8 3M5 5.2v3M7 5.2v3"
+        stroke="#ea3a3a"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
 
 const PRIORITIES = ['High', 'Medium', 'Low'] as const
 const STATUSES = ['To do', 'In Progress', 'Done'] as const
@@ -29,7 +46,7 @@ function formatDeadline(value: string) {
 export function CreateCardPage() {
   const draft = loadCardDraft()
   const [mode, setMode] = useState<'form' | 'preview'>(draft.mode)
-  const [files, setFiles] = useState<File[]>(draft.files)
+  const [images, setImages] = useState<CardImage[]>(draft.images)
   const [tagDraft, setTagDraft] = useState(draft.tagDraft)
   const {
     register,
@@ -43,23 +60,29 @@ export function CreateCardPage() {
   })
 
   const values = watch()
-  const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files])
 
   useEffect(() => {
-    saveCardDraft({ values, mode, tagDraft, files })
-  }, [values, mode, tagDraft, files])
-
-  useEffect(() => {
-    return () => previews.forEach((url) => URL.revokeObjectURL(url))
-  }, [previews])
+    saveCardDraft({ values, mode, tagDraft, images })
+  }, [values, mode, tagDraft, images])
 
   const addFiles = (list: FileList | null) => {
-    if (!list) return
-    setFiles((current) => [...current, ...Array.from(list)].slice(0, 6))
+    if (!list?.length) return
+    Array.from(list).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const preview = String(reader.result || '')
+        setImages((current) => {
+          if (current.length >= 6) return current
+          if (current.some((item) => item.name === file.name && item.file.size === file.size)) return current
+          return [...current, { name: file.name, preview, file }]
+        })
+      }
+      reader.readAsDataURL(file)
+    })
   }
 
-  const removeFile = (index: number) => {
-    setFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))
+  const removeImage = (index: number) => {
+    setImages((current) => current.filter((_, itemIndex) => itemIndex !== index))
   }
 
   const addTag = (raw: string) => {
@@ -125,10 +148,10 @@ export function CreateCardPage() {
               })}
             </div>
           ) : null}
-          {previews.length ? (
+          {images.length ? (
             <div className={styles.thumbs}>
-              {previews.map((src) => (
-                <img key={src} className={styles.thumb} src={src} alt="" />
+              {images.map((image) => (
+                <img key={image.name} className={styles.thumb} src={image.preview} alt={image.name} />
               ))}
             </div>
           ) : null}
@@ -155,7 +178,7 @@ export function CreateCardPage() {
             JSON.stringify(
               {
                 ...data,
-                images: files.map((file) => file.name),
+                images: images.map((image) => image.name),
               },
               null,
               2,
@@ -256,8 +279,8 @@ export function CreateCardPage() {
               </div>
             </div>
             <div className={styles.field}>
-              <span className={styles.label}>Images{files.length ? ` (${files.length})` : ''}</span>
-              {files.length === 0 ? (
+              <span className={styles.label}>Images{images.length ? ` (${images.length})` : ''}</span>
+              {images.length === 0 ? (
                 <label
                   className={styles.drop}
                   onDragOver={(event) => event.preventDefault()}
@@ -282,23 +305,28 @@ export function CreateCardPage() {
                 </label>
               ) : (
                 <div className={styles.imageGrid}>
-                  {files.map((file, index) => (
-                    <div key={`${file.name}-${file.size}-${file.lastModified}`} className={styles.imageItem}>
-                      <div className={styles.imageThumbWrap}>
-                        <img className={styles.imageThumb} src={previews[index]} alt={file.name} />
+                  {images.map((image, index) => (
+                    <div key={`${image.name}-${index}`} className={styles.imageItem}>
+                      <div
+                        className={styles.imageThumbWrap}
+                        style={{ background: IMAGE_FALLBACKS[index % IMAGE_FALLBACKS.length] }}
+                      >
+                        {image.preview ? (
+                          <img className={styles.imageThumb} src={image.preview} alt={image.name} />
+                        ) : null}
                         <button
                           className={styles.imageRemove}
                           type="button"
-                          aria-label={`Remove ${file.name}`}
-                          onClick={() => removeFile(index)}
+                          aria-label={`Remove ${image.name}`}
+                          onClick={() => removeImage(index)}
                         >
-                          🗑️
+                          <TrashIcon />
                         </button>
                       </div>
-                      <span className={styles.imageName}>{file.name}</span>
+                      <span className={styles.imageName}>{image.name}</span>
                     </div>
                   ))}
-                  {files.length < 6 ? (
+                  {images.length < 6 ? (
                     <label className={styles.imageAdd}>
                       <input
                         className={styles.file}
@@ -325,7 +353,7 @@ export function CreateCardPage() {
             onClick={() => {
               clearCardDraft()
               reset(EMPTY_CARD_FORM)
-              setFiles([])
+              setImages([])
               setTagDraft('')
               setMode('form')
             }}

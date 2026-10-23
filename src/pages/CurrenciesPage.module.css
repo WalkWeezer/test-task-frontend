@@ -213,3 +213,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 22px;
+  }
+
+  .table {
+    min-width: 520px;
+  }
+}

@@ -73,6 +73,7 @@ export async function fetchCurrencyTable(): Promise<CurrencyRow[]> {
   try {
     const start = isoDate(daysAgo(7))
     const end = isoDate(new Date())
+    // bgn тут нет, не прошу — будет 404
     const data = await fetchJson<FrankfurterSeries>(
       `https://api.frankfurter.dev/v1/${start}..${end}?base=USD&symbols=AUD,BRL,CAD,CHF,EUR,GBP,JPY`,
     )
@@ -118,6 +119,7 @@ export async function fetchUsdHistory(code: string, days = 30): Promise<HistoryP
 
   if (code !== 'BGN') return points
 
+  // лев привязан к евро, так что график = eur * текущий коэффициент
   const latest = await fetchJson<OpenErResponse>('https://open.er-api.com/v6/latest/USD')
   const peg = latest.rates.EUR ? latest.rates.BGN / latest.rates.EUR : 1.95583
   return points.map((point) => ({ ...point, value: point.value * peg }))

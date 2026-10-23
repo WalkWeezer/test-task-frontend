@@ -64,7 +64,7 @@ function persist() {
       }),
     )
   } catch {
-    // private mode / quota
+    // safari private mode иногда кидает
   }
 }
 
@@ -115,6 +115,6 @@ export function clearCardDraft() {
   try {
     sessionStorage.removeItem(STORAGE_KEY)
   } catch {
-    // ignore
+    // ок
   }
 }

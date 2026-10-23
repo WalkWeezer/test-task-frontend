@@ -190,3 +190,9 @@
     padding: 20px 16px 32px;
   }
 }
+
+@media (max-width: 640px) {
+  .shellExpanded {
+    grid-template-columns: 200px 1fr;
+  }
+}

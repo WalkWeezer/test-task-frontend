@@ -109,3 +109,9 @@
   font-size: 11px;
   color: var(--muted);
 }
+
+@media (max-width: 520px) {
+  .card {
+    padding: 32px 20px;
+  }
+}

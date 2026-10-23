@@ -1,44 +1,37 @@
-# Test Task — Frontend (React + TypeScript)
+# Тестовое (React + TS)
 
-SPA по тестовому заданию: mock-авторизация, таблица курсов валют с графиком к USD и форма создания карточки.
+SPA по макету: логин, таблица курсов, форма карточки.
 
-- Деплой: https://test-task-frontend-liart.vercel.app
-- Макет: [Figma Test Task](https://www.figma.com/design/p3bs7nOd0noohqkGTjOvTm/Test-Task)
+- деплой: https://test-task-frontend-liart.vercel.app
+- макет: [Figma](https://www.figma.com/design/p3bs7nOd0noohqkGTjOvTm/Test-Task)
 
-## Запуск
+## запуск
 
 ```bash
-npm install
+npm i
 npm run dev
 ```
 
-Сборка:
+Сборка: `npm run build`
 
-```bash
-npm run build
-npm run preview
-```
+## логин
 
-## Mock-логин
+`admin` / `admin`
 
-- Login: `admin`
-- Password: `admin`
+Бэка нет, сессия в localStorage. Без него на остальные страницы не пускает.
 
-Без авторизации доступна только `/login`. Сессия хранится в `localStorage`.
+## курсы
 
-## API
+Хотел обойтись одним frankfurter, но он BGN не отдаёт (404). Поэтому:
 
-- Актуальные курсы: [Open Exchange Rate API](https://www.exchangerate-api.com/docs/free) (`https://open.er-api.com/v6/latest/USD`) — без ключа, есть BGN и остальные валюты из макета.
-- История графика: [Frankfurter](https://frankfurter.dev/) (`https://api.frankfurter.dev/v1`).
-- Флаги: [Flagcdn](https://flagcdn.com/).
+- таблица — `https://open.er-api.com/v6/latest/USD` (там лев есть)
+- график — `https://api.frankfurter.dev/v1`
+- для BGN на графике беру EUR и умножаю на текущий peg BGN/EUR
 
-Колонки **Surrender / Buy** в макете — bid/ask. Frankfurter отдаёт только mid-курс, поэтому:
+В макете есть Surrender/Buy, а в апи только mid. Накинул спред ±1.2%, иначе колонки пришлось бы дублировать одно и то же число.
 
-- `Course` — mid из API;
-- `Surrender` / `Buy` — mid ± 1.2%;
-- `Change` — разница с предыдущим доступным днём;
-- график — динамика выбранной валюты к USD за 30 дней.
+Флаги — twemoji svg. На винде эмодзи-флаги рисуются как «AU»/«BG», бесит.
 
-## Стек
+## стек
 
-Vite, React 19, TypeScript, React Router, react-hook-form, Recharts, CSS Modules.
+Vite, React, TS, react-router, react-hook-form, recharts. Стили — css modules.

@@ -340,5 +340,21 @@ select.controlError {
 @media (max-width: 960px) {
   .formCard {
     grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .actions,
+  .actionsStart {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .imageGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .title {
+    font-size: 22px;
   }
 }

@@ -8,8 +8,8 @@ import {
 } from 'react'
 
 const STORAGE_KEY = 'test-task-auth'
-export const MOCK_EMAIL = 'user@example.com'
-export const MOCK_PASSWORD = 'password'
+export const MOCK_EMAIL = 'admin'
+export const MOCK_PASSWORD = 'admin'
 
 type AuthContextValue = {
   isAuthenticated: boolean

@@ -44,15 +44,11 @@ export function LoginPage() {
             <span className={errors.email ? styles.iconError : styles.icon}>✉</span>
             <input
               className={errors.email ? styles.inputError : styles.input}
-              type="email"
+              type="text"
               placeholder="Email Address"
               autoComplete="username"
               {...register('email', {
                 required: 'Please enter a valid email address',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Please enter a valid email address',
-                },
               })}
             />
           </span>
@@ -68,7 +64,6 @@ export function LoginPage() {
               autoComplete="current-password"
               {...register('password', {
                 required: 'Password must be at least 6 characters',
-                minLength: { value: 6, message: 'Password must be at least 6 characters' },
               })}
             />
           </span>

@@ -21,8 +21,8 @@ npm run preview
 
 ## Mock-логин
 
-- Email: `user@example.com`
-- Password: `password`
+- Login: `admin`
+- Password: `admin`
 
 Без авторизации доступна только `/login`. Сессия хранится в `localStorage`.
 
